@@ -12,6 +12,7 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 
+
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
@@ -34,12 +35,13 @@ var requestHandler = function(request, response) {
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
-
+var options = {method: 'GET', host: 'https://api.parse.com/1/classes/messages'};
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = "text/plain";
+  headers['url'] = 'https://api.parse.com/1/classes/chatterbox'
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
@@ -71,3 +73,4 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10 // Seconds.
 };
 
+exports.requestHandler = requestHandler;
