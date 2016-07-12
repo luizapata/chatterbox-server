@@ -35,9 +35,10 @@ var requestHandler = function(request, response) {
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
-   var method = request.method;
+  var method = request.method;
   var url = request.url;
-  var body = '/classes/room';
+  var body = '';
+  var results = [];
   // var url = request.url;
   // Tell the client we are sending them plain text.
   //
@@ -45,19 +46,42 @@ var requestHandler = function(request, response) {
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = "application/json";
 
-    var responseBody = {
-      headers: headers,
-      method: method,
-      url: url,
-      body: body
-    };
+  var responseBody = {
+    headers: headers,
+    method: method,
+    url: url,
+    body: body,
+    results: results,
+  };
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers,json);
+  response.writeHead(statusCode, headers, json);
 
 
-   var json = JSON.stringify(responseBody)
+  var json = JSON.stringify(responseBody)
+
+
+if (method == 'POST') {
+    console.log("POST");
+    var body = '';
+    request.on('data', function (data) {
+        body += data;
+    });
+    request.on('end', function () {
+      data[url] = body;
+      chunkdata.toString();
+        console.log("Body: " + body);
+    });
+
+    var fs = require('fs');
+var exec = require('child_process').exec;
+
+var cmd = 'convert ./test.jpg -';
+exec(cmd, {encoding: 'binary', maxBuffer: 5000*1024}, function(error, stdout) {
+  fs.writeFileSync('test2.jpg', stdout, 'binary');
+});
+
 
 
   // Make sure to always call response.end() - Node may not send
@@ -67,7 +91,7 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end(json);
+  response.end(json, body, results);
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -79,6 +103,11 @@ var requestHandler = function(request, response) {
 //
 // Another way to get around this restriction is to serve you chat
 // client from this domain by setting up static file serving.
+var data = {};
+
+
+
+
 var defaultCorsHeaders = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
