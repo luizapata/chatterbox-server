@@ -1,3 +1,6 @@
+var data = {
+  results : []
+};
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -13,7 +16,7 @@ this file and include it in basic-server.js so that it actually works.
 **************************************************************/
 // https://api.parse.com/1/classes/chatterbox
 
-var requestHandler = function(request, response) {
+exports.requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -35,10 +38,6 @@ var requestHandler = function(request, response) {
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
-  var method = request.method;
-  var url = request.url;
-  var body = '';
-  var results = [];
   // var url = request.url;
   // Tell the client we are sending them plain text.
   //
@@ -46,53 +45,41 @@ var requestHandler = function(request, response) {
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = "application/json";
 
-  var responseBody = {
-    headers: headers,
-    method: method,
-    url: url,
-    body: body,
-    results: results,
-  };
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers, json);
 
 
-  var json = JSON.stringify(responseBody)
 
+  var body = []
+  if(request.url === '/classes/messages' || request.url === '/classes/room1'){
+    if(request.method === 'POST'){
+      statusCode = 201; 
 
-if (method == 'POST') {
-    console.log("POST");
-    var body = '';
-    request.on('data', function (data) {
-        body += data;
-    });
-    request.on('end', function () {
-      data[url] = body;
-      chunkdata.toString();
-        console.log("Body: " + body);
-    });
+      request.on('data', function(chunk){
+        body.push(chunk)
+      });
 
-    var fs = require('fs');
-var exec = require('child_process').exec;
-
-var cmd = 'convert ./test.jpg -';
-exec(cmd, {encoding: 'binary', maxBuffer: 5000*1024}, function(error, stdout) {
-  fs.writeFileSync('test2.jpg', stdout, 'binary');
-});
-
-
+      request.on('end', function(){
+        body = JSON.parse(body.toString());
+        data.results.push(body)
+      })
+    }
+  } else {
+    statusCode = 404;
+  }
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
   // response.end() will be the body of the response - i.e. what shows
   // up in the browser.
+  response.writeHead(statusCode, headers);
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end(json, body, results);
+  response.end(JSON.stringify(data));
 };
+
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
 // This code allows this server to talk to websites that
@@ -103,11 +90,6 @@ exec(cmd, {encoding: 'binary', maxBuffer: 5000*1024}, function(error, stdout) {
 //
 // Another way to get around this restriction is to serve you chat
 // client from this domain by setting up static file serving.
-var data = {};
-
-
-
-
 var defaultCorsHeaders = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
@@ -115,4 +97,3 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10 // Seconds.
 };
       
-exports.requestHandler = requestHandler;

@@ -61,8 +61,8 @@ describe('server', function() {
           var messages = JSON.parse(body).results;
           expect(messages[0].username).to.equal('Jono');
           expect(messages[0].message).to.equal('Do my bidding!');
+          done();
         });
-      done();
     });
   });
 
